@@ -35,3 +35,41 @@ Firebaseと連携した確認
 ````
 
 
+
+## Blazor→JavaScriptへの連携
+
+こんな感じで連携できます。
+単純にJavaScriptのメソッドを呼び出すだけです。
+
+https://github.com/uemegu/GloriousFutureOnline/blob/master/BlazorProject/ViewModels/PredictModel.cs#L81
+
+````csharp
+_jsRuntime.InvokeAsync<object>("notifyPredict", Word.Day, Word.ToString());
+````
+
+## JavaScript→Blazorへの連携
+
+`DotNetObjectRef.Create(ラップしたいオブジェクト)`でJavaScriptから呼び出したいメソッドを持ったインスタンスをラップして、`JSRuntime.InvokeAsync`でオブジェクトをJavaScriptの世界に渡します。
+
+https://github.com/uemegu/GloriousFutureOnline/blob/master/BlazorProject/Pages/Index.razor#L23
+
+````csharp
+await JSRuntime.InvokeAsync<object>( "passHelper", DotNetObjectRef.Create(viewModel));
+````
+
+https://github.com/uemegu/GloriousFutureOnline/blob/master/BlazorProject/Firebase/public/index.html#L57
+
+````javascript
+function passHelper(helper) {
+    window.helper = helper;
+````
+
+
+JavaScriptの世界では受け取ったオブジェクトの`invokeMethod`でBlazorのメソッドが呼べるようなります。
+https://github.com/uemegu/GloriousFutureOnline/blob/master/BlazorProject/Firebase/public/index.html#L61
+
+````javascript
+window.helper.invokeMethod("SetWord", window.predict);
+````
+
+
