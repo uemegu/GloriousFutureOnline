@@ -1,0 +1,29 @@
+﻿@page "/"
+@inject HttpClient httpClient
+@inject IJSRuntime JSRuntime
+
+<div class="predict">
+  <h3>@viewModel.Word.Day</h3>
+  <h2>@viewModel.Word.ToString()</h2>
+</div>
+
+<button @onclick="@Run">@viewModel.ButtonText</button>
+
+
+@code {
+  private PredictModel viewModel;
+
+  protected override async Task OnInitAsync()
+  {
+       viewModel = new PredictModel(httpClient, JSRuntime);
+       await viewModel.Load();
+       viewModel.PropertyChanged += (o, e) => {
+         this.StateHasChanged();
+       };
+       await JSRuntime.InvokeAsync<object>( "passHelper", DotNetObjectRef.Create(viewModel));
+  }
+
+  private void Run() {
+      viewModel.Tap();
+  }
+}

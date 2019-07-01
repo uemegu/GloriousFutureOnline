@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Glorious Future Online</title>
+    <base href="/" />
+    <link href="css/site.css" rel="stylesheet" />
+    <style>
+        html, body {
+            background: black;
+            color: yellow;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .content {
+            display: flex;
+            flex-flow: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .predict {
+            height: 15rem;
+            text-align: center;
+        }
+        button {
+            background: black;
+            font-size: 28px;
+            color: white;
+            padding: .5rem 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #222;
+        }
+    </style>
+
+    <script defer src="/__/firebase/6.2.4/firebase-app.js"></script>
+    <script defer src="/__/firebase/6.2.4/firebase-auth.js"></script>
+    <script defer src="/__/firebase/6.2.4/firebase-database.js"></script>
+    <script defer src="/__/firebase/6.2.4/firebase-messaging.js"></script>
+    <script defer src="/__/firebase/6.2.4/firebase-storage.js"></script>
+    <script defer src="/__/firebase/init.js"></script>
+
+    <script>
+        function notifyPredict(date, string) {
+            console.log(date + string);
+        }
+        function passHelper(helper) {
+            window.helper = helper;
+        }
+    </script>
+</head>
+<body>
+    <div class="content">
+        <app>汝、我が予言を所望するか・・・</app>
+    </div>
+
+    <script src="_framework/blazor.webassembly.js"></script>
+</body>
+</html>

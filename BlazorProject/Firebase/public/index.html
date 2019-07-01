@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Glorious Future Online</title>
+    <meta property="og:locale" content="ja_JP" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Glorious Future Online" />
+    <meta property="og:description" content="5W1Hで予言！" />
+    <meta property="og:url" content="https://gloriousfutureonline.firebaseapp.com" />
+    <meta property="og:site_name" content="Glorious Future Online" />
+    <meta property="og:image" content="https://gloriousfutureonline.firebaseapp.com/images/icons/icon-384x384.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:description" content="5W1Hで予言！" />
+    <meta name="twitter:title" content="Glorious Future Online" />
+    <meta name="twitter:site" content="@megyo9" />
+    <base href="/" />
+    <style>
+        html, body {
+            background: black;
+            color: yellow;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .content {
+            display: flex;
+            flex-flow: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .predict {
+            height: 15rem;
+            text-align: center;
+        }
+        button {
+            background: black;
+            font-size: 28px;
+            color: white;
+            padding: .5rem 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #222;
+        }
+    </style>
+
+    <script defer src="/__/firebase/6.2.4/firebase-app.js"></script>
+    <script defer src="/__/firebase/6.2.4/firebase-firestore.js"></script>
+    <script defer src="/__/firebase/6.2.4/firebase-messaging.js"></script>
+    <script defer src="/__/firebase/6.2.4/firebase-auth.js"></script>
+    <script defer src="/__/firebase/init.js"></script>
+    
+    <script>
+        function passHelper(helper) {
+            window.helper = helper;
+            if(window.location.search) {
+                window.predict = decodeURI(window.location.search.substr(1));
+                window.helper.invokeMethod("SetWord", window.predict);
+            }
+        }
+        function notifyPredict(when, happen) {
+            window.predict = when + " " + happen;
+            addCollection("predict", {
+                happen: happen,
+                when: when,
+                updatetime: dateFormat.format(new Date(), 'yyyyMMdd')
+            });
+            console.log(date + string);
+        }
+        function addCollection(collection, record) {
+            firebase.firestore().collection(collection).add(record)
+            .then(function(docRef) {
+                console.log("Document written with ID: ", docRef.id);
+                localStorage.setItem(collection, docRef.id);
+            })
+            .catch(function(error) {
+                console.error("Error adding document: ", error);
+            });
+        }
+        function setCollection(collection, id, record) {
+            firebase.firestore().collection(collection).doc(id).set(record);
+        }
+        // https://qiita.com/egnr-in-6matroom/items/37e65bb642d2e158804c
+        const dateFormat = {
+            _fmt : {
+                "yyyy": function(date) { return date.getFullYear() + ''; },
+                "MM": function(date) { return ('0' + (date.getMonth() + 1)).slice(-2); },
+                "dd": function(date) { return ('0' + date.getDate()).slice(-2); },
+                "hh": function(date) { return ('0' + date.getHours()).slice(-2); },
+                "mm": function(date) { return ('0' + date.getMinutes()).slice(-2); },
+                "ss": function(date) { return ('0' + date.getSeconds()).slice(-2); }
+            },
+            _priority : ["yyyy", "MM", "dd", "hh", "mm", "ss"],
+            format: function(date, format){
+                return this._priority.reduce((res, fmt) => res.replace(fmt, this._fmt[fmt](date)), format)
+            }
+        };
+        function Initialize() {
+            const twitterButton = document.getElementById('twitter_link');
+            twitterButton.addEventListener('click', function() {
+                const ua = navigator.userAgent;
+                if(!window.predict) window.predict = '';
+                const url = 'https://twitter.com/intent/tweet?hashtags=gfo&text=' + encodeURI(window.predict);
+                if (ua.indexOf('iPhone') > 0 || ua.indexOf('Android') > 0 && ua.indexOf('Mobile') > 0 || ua.indexOf('iPad') > 0 || ua.indexOf('Android') > 0) {
+                    window.location.href = url;
+                } else {
+                    window.open(url, 'tweet');
+                }
+            }, false);
+
+            try {
+                const messaging = firebase.messaging();
+                messaging.usePublicVapidKey("鍵をここに書く");
+                messaging.requestPermission().then(function() {
+                messaging.getToken().then(function(currentToken) {
+                    if (currentToken) {
+                        if(!localStorage.getItem('token')) {
+                            addCollection("token", {
+                                token: currentToken,
+                                updatetime: dateFormat.format(new Date(), 'yyyyMMdd')
+                            });
+                        } else {
+                            setCollection("token", localStorage.getItem('token'), {
+                                token: currentToken,
+                                updatetime: dateFormat.format(new Date(), 'yyyyMMdd')
+                            });
+                        }
+                    } else {
+                        console.log('No Instance ID token available. Request permission to generate one.');
+                    }
+                    }).catch(function(err) {
+                        console.log('An error occurred while retrieving token. ', err);
+                    });
+                }).catch(function(err) {
+                    console.log('Unable to get permission to notify.', err);
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            firebase.auth().signInAnonymously().then(function() {
+                Initialize();
+            }).catch(function(error) {
+                alert(error.message);
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="content">
+        <app>汝、我が予言を所望するか・・・</app>
+    </div>
+
+
+    <div style="display: flex">
+        <a id="twitter_link" style="    position: fixed; bottom: 0; left: calc(50% - 24px);">
+            <img src="images/twitter.png" width="48px" height="48px" >
+        </a>
+    </div>
+    <script src="_framework/blazor.webassembly.js"></script>
+</body>
+</html>
